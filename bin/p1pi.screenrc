@@ -1,0 +1,5 @@
+screensession p1pi
+# start the water monitoring script
+screen  -t readP1 /home/pi/Programming/SmartMeter/bin/readP1.sh
+screen  -t uploadData /home/pi/Programming/SmartMeter/bin/uploadData.sh
+
