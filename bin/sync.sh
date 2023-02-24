@@ -4,7 +4,7 @@
 
 
 RSYNC=/usr/bin/rsync
-LOCAL=/Users/lodewijk/Programming/SmartMeter/
+LOCAL=/zfs/lodewijk/Programming/SmartMeter/
 REMOTE=pi@p1pi.lan:/home/pi/Programming/SmartMeter/
 FLAGS="--stats --progress"
 
@@ -14,7 +14,7 @@ get() {
 }
 
 put() {
-	${RSYNC} -avuz ${LOCAL} ${REMOTE} ${FLAGS} --exclude processed
+	${RSYNC} -avuz ${LOCAL} ${REMOTE} ${FLAGS} --exclude processed --exclude data
 }
 
 

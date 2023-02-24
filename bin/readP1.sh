@@ -5,6 +5,7 @@
 #
 BASEDIR=/home/pi/Programming/SmartMeter/readSerial
 COMMAND="/usr/bin/python -u ./readP1.py"  # -u puts python in unbuffered mode and allows it to stream to the tee log
+NICE="nice -n -19 " # use the nice command to start the process at a high priority and reduce buffer timeouts
 RUNNING=-1
 TEEFILE="readP1.log"
 
@@ -25,11 +26,19 @@ checkIfRunning() {
 
 loop() {
   while [ 1 ]; do
+    # cleanup the directoru and move all p1data files to the data directory
+    for f in p1data.*; do
+	if [[ -f $f ]]; then
+		mv $f ../data/
+	fi
+    done
+
+    # now process the log file
     if [ -e ${TEEFILE} ]; then
       DATESTRING=`date +'%s'`
       mv ${TEEFILE} ../data/${TEEFILE}.${DATESTRING}
     fi	
-    ${COMMAND} | egrep -v "E1 |E2 |T1 |T2 |P1 |P2 " | tee ${TEEFILE}
+    ${COMMAND} | tee ${TEEFILE}
     sleep 1
   done
 }

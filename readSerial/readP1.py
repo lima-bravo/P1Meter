@@ -1,5 +1,7 @@
 #!/usr/bin/python
 #
+# Most of this file copied from https://github.com/gejanssen/slimmemeter-rpi/
+#
 # DSMR P1 uitlezen
 # (c) 10-2012 - GJ - gratis te kopieren en te plakken
 __version__ = "1.0"

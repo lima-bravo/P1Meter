@@ -1,1 +1,6 @@
 data
+.idea/
+processP1data/nb-configuration.xml
+processP1data/setup.py
+processP1data/processp1data/__init__.py
+readP1.log

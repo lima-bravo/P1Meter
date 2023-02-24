@@ -85,7 +85,7 @@ for f in os.listdir(basedir):
         newfile=filename.replace("p1data","p1proc")
         # check if the newfile exists, if so, skip
         if os.path.isfile(newfile):
-            print "Skipping "+filename
+            print "Skipping "+filename+", already processed"
         else:
             # check if the filesize is greater than 100 bytes
             if os.path.getsize(filename)>100:
