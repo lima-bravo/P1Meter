@@ -8,7 +8,7 @@ try:
 	db = DB(dbname='sensordata', host='imac.lan', port=5432, user='sensor_main', passwd='SuperSensor')
 except Exception:
 	import sys
-	print "Error accessing database"
+	print( "Error accessing database")
 	sys.exit(1)
 
 
@@ -29,7 +29,7 @@ def createDBtables():
         #
         query="CREATE TABLE IF NOT EXISTS "+d
         query+=" (ts timestamp PRIMARY KEY UNIQUE, val NUMERIC(10,4))"
-        print query
+        print( query)
         db.query(query)
         # now create the index -- not needed, primary key added
         # query="CREATE INDEX IF NOT EXISTS %s_idx_ts ON %s (ts)" % (d,d)
@@ -50,7 +50,7 @@ def processFile(filename):
     # initialize the basic values
     global DT
     # start processing the file
-    print filename
+    print(filename)
     f=open(filename,'r') # open the file, read only
     line=f.readline()
     ## now enter the loop
@@ -85,18 +85,19 @@ for f in os.listdir(basedir):
         newfile=filename.replace("p1data","p1proc")
         # check if the newfile exists, if so, skip
         if os.path.isfile(newfile):
-            print "Skipping "+filename+", already processed"
+            print( "Skipping "+filename+", already processed")
         else:
             # check if the filesize is greater than 100 bytes
             if os.path.getsize(filename)>100:
                 processFile(filename)
                 # now rename the file so we don't process it again
-                print filename,newfile
+                print(filename,newfile)
                 os.rename(filename,newfile)
             else:
-                print "File too small : skipping "+filename
+                print("File too small : skipping "+filename) 
             
 
     
 db.close()
-print "Done"
+print("Done")
+
