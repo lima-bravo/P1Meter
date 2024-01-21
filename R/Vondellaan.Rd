@@ -74,12 +74,15 @@ processMeterData <- function(dbf,table) {
 
 
 buildNestedQuery<- function(date,table, unit='day', limit=-1) {
-	
+	# Added the EXTRACT(EPOCH FROM () ) construct to convert Deltatimestamps to per second
+	# EXTRACT( EPOCH FROM ((tg-lag(tg,1) OVER ( ORDER BY tg)))) AS dt	
+	# or
+	# AGE(tg, lag(tg,1) OVER (ORDER BY tg)) AS dt	
 	sql <- sprintf("
 		SELECT 
 			tg AS ts_time, 
 			(val-lag(val,1) OVER( ORDER BY tg)) AS dval,
-			(tg-lag(tg,1) OVER ( ORDER BY tg)) AS dt			 
+			EXTRACT( EPOCH FROM ((tg-lag(tg,1) OVER ( ORDER BY tg)))) AS dt
 		FROM ( 
 		SELECT date_trunc('%s',ts) AS tg, max(val)  AS val 
 		FROM %s
@@ -148,14 +151,14 @@ addVelocityColumn <- function(dbf) {
 unitset <-c('minute','hour','day','week','month','quarter','year')
 
 
-unit <- unitset[7]
+unit <- unitset[1]
 
 
 targetDate <- Sys.Date()
 
 switch(unit,
-		'minute' = targetDate <- targetDate - 4,
-		'hour' = targetDate <- targetDate - 5,
+		'minute' = targetDate <- targetDate - 3,
+		'hour' = targetDate <- targetDate - 8,
 		'day' = targetDate <- targetDate - 90,
 		'week' = targetDate <- '2021-04-01',
 		'month' = targetDate <- '2021-04-01',
@@ -194,11 +197,12 @@ cat(sprintf("Data collected, last time unit %s",max(total[,"ts_time"])))
 
 old.par <- par(mfrow=c(3,1))
 
-barplot(total$water,col='blue',border=NA,pch=20, ylim=c(0,scalef*maxwater),main="water")
+# formerly barplot, now plot
+plot(tstime,water,col='blue',border=NA,pch=20, ylim=c(0,scalef*maxwater),main="water")
 #barplot(total$v_water,col='blue',border=NA,pch=20, ylim=c(0,scalef*maxvwater),main="water")
 
-bars=barplot(total$elec,col='red',pch=20, border=NA, ylim=c(0,scalef*maxelec), main="Elec", xlab="Time")
-barplot(total$ampere,col='red',pch=20, border=NA, ylim=c(0,scalef*maxvelec), main="Ampere", xlab="Time")
+plot(total$elec,col='red',pch=20, border=NA, ylim=c(0,scalef*maxelec), main="Elec", xlab="Time")
+plot(total$ampere,col='red',pch=20, border=NA, ylim=c(0,scalef*maxvelec), main="Ampere", xlab="Time")
 
 #barplot(enow$enow,col='orange',pch=20, border=NA, ylim=c(0,scalef*maxenow), main="Max(elec)", xlab="Time")
 #

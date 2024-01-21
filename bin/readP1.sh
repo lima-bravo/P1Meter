@@ -4,7 +4,7 @@
 #
 #
 BASEDIR=/home/pi/Programming/SmartMeter/readSerial
-COMMAND="/usr/bin/python -u ./readP1.py"  # -u puts python in unbuffered mode and allows it to stream to the tee log
+COMMAND="/usr/bin/python3 -u ./readP1.py"  # -u puts python in unbuffered mode and allows it to stream to the tee log
 NICE="nice -n -19 " # use the nice command to start the process at a high priority and reduce buffer timeouts
 RUNNING=-1
 TEEFILE="readP1.log"
