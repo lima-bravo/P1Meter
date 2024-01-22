@@ -56,6 +56,7 @@ def createDBtables():
 def insertValue(table,ts,val):
     query = sql.SQL("""
            INSERT INTO {} VALUES(to_timestamp(%s),%s)
+           ON CONFLICT (ts) DO NOTHING
            """).format(sql.Identifier(table))
     try:
         ts_rounded = round(ts, 3)
@@ -112,6 +113,7 @@ for f in os.listdir(basedir):
             # check if the filesize is greater than 100 bytes
             if os.path.getsize(filename)>100:
                 processFile(filename)
+                conn.commit()
                 # now rename the file so we don't process it again
                 print(filename,newfile)
                 os.rename(filename,newfile)

@@ -52,6 +52,7 @@ def insertValue(table,ts,val):
     global Exc,Tot
     query = sql.SQL("""
                INSERT INTO {} VALUES(to_timestamp(%s),%s)
+               ON CONFLICT (ts) DO NOTHING
                """).format(sql.Identifier(table))
     try:
         Tot += 1
