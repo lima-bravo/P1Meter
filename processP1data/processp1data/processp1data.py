@@ -2,15 +2,26 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 
-from pg import DB
+import os, sys
+import psycopg2
+from psycopg2 import sql
 
 try:
-	db = DB(dbname='sensordata', host='imac.lan', port=5432, user='sensor_main', passwd='SuperSensor')
-except Exception:
-	import sys
-	print "Error accessing database"
-	sys.exit(1)
-
+    # db = DB(dbname='sensordata', host='imac.lan', port=5432, user='sensor_main', passwd='SuperSensor')
+    # Connect to the PostgreSQL database
+    conn = psycopg2.connect(
+        host="imac.lan",
+        port="5432",
+        dbname="sensordata",
+        user="sensor_main",
+        password="SuperSensor"
+    )
+    cur = conn.cursor()
+except psycopg2.Error as e:
+    # Handle specific PostgreSQL errors if needed
+    # For now, print a generic error message
+    print("Error connecting to the database:", e)
+    sys.exit()
 
 
 DT=0 # timestamp
@@ -27,10 +38,14 @@ def createDBtables():
         #query="DROP TABLE %s" % (d)
         #db.query(query)
         #
-        query="CREATE TABLE IF NOT EXISTS "+d
-        query+=" (ts timestamp PRIMARY KEY UNIQUE, val NUMERIC(10,4))"
-        print query
-        db.query(query)
+        query= sql.SQL("""
+        CREATE TABLE IF NOT EXISTS {} (
+            ts timestamp PRIMARY KEY UNIQUE, 
+            val NUMERIC(10,4)
+            )
+        """).format(sql.Identifier(d))
+        print(query)
+        cur.execute(query)
         # now create the index -- not needed, primary key added
         # query="CREATE INDEX IF NOT EXISTS %s_idx_ts ON %s (ts)" % (d,d)
         # print query
@@ -38,19 +53,25 @@ def createDBtables():
 
 
 def insertValue(table,ts,val):
-    sql="INSERT INTO %s VALUES(to_timestamp(%i),%s)" % (table,ts,val)
-    # print sql
+    query = sql.SQL("""
+           INSERT INTO {} VALUES(to_timestamp(%s),%s)
+           """).format(sql.Identifier(table))
     try:
-        db.query(sql)
-    except Exception:
-        # print "Constraints violation on "+sql
-        pass
+        ts_rounded = round(ts, 3)
+        cur.execute(query, (ts_rounded, val))
+        # db.query(sql)
+    except psycopg2.Error as e:
+        print(query, (ts, val))
+        # Handle specific PostgreSQL errors if needed
+        # For now, print a generic error message
+        print("Error inserting data into table:", table)
+        print("Error:", e)
 
 def processFile(filename):
     # initialize the basic values
     global DT
     # start processing the file
-    print filename
+    print(filename)
     f=open(filename,'r') # open the file, read only
     line=f.readline()
     ## now enter the loop
@@ -85,18 +106,23 @@ for f in os.listdir(basedir):
         newfile=filename.replace("p1data","p1proc")
         # check if the newfile exists, if so, skip
         if os.path.isfile(newfile):
-            print "Skipping "+filename+", already processed"
+            print(f"Skipping {filename} already processed")
         else:
             # check if the filesize is greater than 100 bytes
             if os.path.getsize(filename)>100:
                 processFile(filename)
                 # now rename the file so we don't process it again
-                print filename,newfile
+                print(filename,newfile)
                 os.rename(filename,newfile)
             else:
-                print "File too small : skipping "+filename
+                print(f"File too small : skipping {filename}")
             
 
     
-db.close()
-print "Done"
+# db.close()
+conn.commit()
+cur.close()
+conn.close()
+#
+print("Done")
+

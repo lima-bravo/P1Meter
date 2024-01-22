@@ -16,7 +16,7 @@ while [ 1 ]; do
 	echo "`date` : P1data file count : " ${LSCNT}
 	if [ ${LSCNT} -gt 0 ]; then
 		sleep 5 # to prevent race condition of processing a file still being moved
-		python /home/pi/Programming/SmartMeter/processP1data/processp1data/processp1data.py
+		python3 /home/pi/Programming/SmartMeter/processP1data/processp1data/processp1data.py
 		if [ $? -eq 0 ]; then
 			echo Process completed successfully
 		fi
