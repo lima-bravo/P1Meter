@@ -197,7 +197,7 @@ class P1Packet(object):
 
 def printIfChanged(name,var1,var2,file):
     if var1!=var2:
-        print '{} {}'.format(name, var1)
+        print( '{} {}'.format(name, var1))
         file.write('{} {}\n'.format(name, var1))
 
     return var1
@@ -233,7 +233,7 @@ while measure:
     filename="p1data."+str(int(time.time()))
     #
     # now open the file ready for writing
-    f = open(filename,'w',0)  # open unbuffered
+    f = open(filename,'w')  # open unbuffered
     # the file is now open.
     #
     # reset the standard values and their history values
@@ -253,20 +253,20 @@ while measure:
         ## now print changing data
         T1=packet['kwh']['high']['consumed']
         T2=packet['kwh']['low']['consumed']
-	P1=packet['kwh']['high']['produced']
+        P1=packet['kwh']['high']['produced']
         P2=packet['kwh']['low']['produced']
         E1=packet['kwh']['current_consumed']
-	E2=packet['kwh']['current_produced']
+        E2=packet['kwh']['current_produced']
         # G1=packet['gas']['total']
 
         #
         printIfChanged("DT",int(time.time()),0,f)
         dT1=printIfChanged("T1",T1,dT1,f)
         dT2=printIfChanged("T2",T2,dT2,f)
-	dP1=printIfChanged("P1",P1,dP1,f)
+        dP1=printIfChanged("P1",P1,dP1,f)
         dP2=printIfChanged("P2",P2,dP2,f)
         dE1=printIfChanged("E1",E1,0,f)
-	dE2=printIfChanged("E2",E2,0,f)
+        dE2=printIfChanged("E2",E2,0,f)
         # dG1=printIfChanged("G1",G1,dG1,f)
 
 

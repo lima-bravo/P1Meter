@@ -24,6 +24,7 @@ except psycopg2.Error as e:
     sys.exit()
 
 
+
 DT=0 # timestamp
 E1=0 # current draw
 E2=0 # current production
