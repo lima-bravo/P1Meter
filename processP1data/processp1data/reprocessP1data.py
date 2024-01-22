@@ -4,9 +4,26 @@
 
 # This utility reprocesses the collected data to compensate for missing data when uploading from the raspberry pi
 
+import os, sys
+import psycopg2
+from psycopg2 import sql
 
-from pg import DB
-db = DB(dbname='sensordata', host='imac.lan', port=5432, user='sensor_main', passwd='SuperSensor')
+try:
+    # db = DB(dbname='sensordata', host='imac.lan', port=5432, user='sensor_main', passwd='SuperSensor')
+    # Connect to the PostgreSQL database
+    conn = psycopg2.connect(
+        host="imac.lan",
+        port="5432",
+        dbname="sensordata",
+        user="sensor_main",
+        password="SuperSensor"
+    )
+    cur = conn.cursor()
+except psycopg2.Error as e:
+    # Handle specific PostgreSQL errors if needed
+    # For now, print a generic error message
+    print("Error connecting to the database:", e)
+    sys.exit()
 
 
 DT=0 # timestamp
@@ -21,37 +38,38 @@ def createDBtables():
     datatables=['ehigh','elow','enow','gas']
     # now create the datatables
     for d in datatables:
-        # drop table for now
-        #query="DROP TABLE %s" % (d)
-        #db.query(query)
-        #
-        query="CREATE TABLE IF NOT EXISTS "+d
-        query+=" (ts timestamp PRIMARY KEY UNIQUE, val NUMERIC(10,4))"
-        print query
-        db.query(query)
-        # now create the index -- not needed, primary key added
-        # query="CREATE INDEX IF NOT EXISTS %s_idx_ts ON %s (ts)" % (d,d)
-        # print query
-        # db.query(query)
+        query = sql.SQL("""
+        CREATE TABLE IF NOT EXISTS {} (
+            ts timestamp PRIMARY KEY UNIQUE, 
+            val NUMERIC(10,4)
+            )
+        """).format(sql.Identifier(d))
+        print(query)
+        cur.execute(query)
 
 
 def insertValue(table,ts,val):
     global Exc,Tot
-    sql="INSERT INTO %s VALUES(to_timestamp(%i),%s)" % (table,ts,val)
-    # print sql
+    query = sql.SQL("""
+               INSERT INTO {} VALUES(to_timestamp(%s),%s)
+               """).format(sql.Identifier(table))
     try:
-        Tot+=1
-        db.query(sql)
-    except Exception:
-        # print "\tConstraints violation on "+sql
+        Tot += 1
+        ts_rounded = round(ts, 3)
+        cur.execute(query, (ts_rounded, val))
+    except psycopg2.Error as e:
+        #print(query, (ts, val))
+        # Handle specific PostgreSQL errors if needed
+        # For now, print a generic error message
+        #print("Error inserting data into table:", table)
+        #print("Error:", e)
         Exc+=1
-        pass
 
 def processFile(filename):
     # initialize the basic values
     global DT
     # start processing the file
-    print filename
+    print(filename)
     f=open(filename,'r') # open the file, read only
     line=f.readline()
     ## now enter the loop
@@ -83,13 +101,14 @@ for f in os.listdir(basedir):
         filename=os.path.join(basedir,f)
         Exc=0
         Tot=0
-        print ("Processing "),
+        print("Processing "),
         processFile(filename)
-        print ("Total %d, Exceptions %d\n") % (Tot,Exc)
+        print("Total %d, Exceptions %d\n") % (Tot,Exc)
         # now rename the file so we don't process it again
     
-            
 
-    
-db.close()
-print "Done"
+conn.commit()
+cur.close()
+conn.close()
+#
+print("Done")

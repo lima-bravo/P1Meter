@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Most of this file copied from https://github.com/gejanssen/slimmemeter-rpi/
 #

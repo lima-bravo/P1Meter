@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# pipe the output of the tail through this script
+# pipe the output of 'tail -f logfile' through this script to see when the solar panels are generating electricity
 #
 DT=""
 while read -r line; do
