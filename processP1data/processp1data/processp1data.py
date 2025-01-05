@@ -111,7 +111,7 @@ for f in os.listdir(basedir):
             print(f"Skipping {filename} already processed")
         else:
             # check if the filesize is greater than 100 bytes
-            if os.path.getsize(filename)>100:
+            if os.path.getsize(filename)>20: # 20240519-134134 JLB made this change, small files can still be legal data
                 processFile(filename)
                 conn.commit()
                 # now rename the file so we don't process it again
