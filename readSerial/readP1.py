@@ -233,7 +233,7 @@ while measure:
     filename="p1data."+str(int(time.time()))
     #
     # now open the file ready for writing
-    f = open(filename,'w', buffering=0)  # open unbuffered
+    f = open(filename,'w', buffering=1)  # open buffered with single line buffer
     # the file is now open.
     #
     # reset the standard values and their history values
