@@ -1,12 +1,20 @@
 #!/bin/bash
 #
-# pipe the output of 'tail -f logfile' through this script to see when the solar panels are generating electricity
+# If LOGFILE exists, runs tail -f on it and filters lines containing E2 (solar generation).
+# Tail's stderr (e.g. "file has been replaced" after log rotation) is suppressed.
 #
-DT=""
-while read -r line; do
+LOGFILE=/home/pi/Programming/SmartMeter/readSerial/readP1.log
+
+if [[ ! -e "$LOGFILE" ]]; then
+	echo "LOGFILE not found: $LOGFILE" >&2
+	exit 1
+fi
+# write a note to stdout that the E2 monitor is starting
+echo "Starting E2 monitor"
+# Suppress tail's stderr (e.g. "file has been replaced" after log rotation)
+tail -f "$LOGFILE" 2>/dev/null | while read -r line; do
 	if [[ $line =~ .*E2.* ]]; then
-	#	echo "DT $line"
-		timestamp=`date "+%y%m%d@%H%M%S"`
+		timestamp=$(date "+%y%m%d@%H%M%S")
 		echo "[$timestamp] $line"
 	fi
 done
