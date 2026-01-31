@@ -47,6 +47,11 @@ loop() {
 #
 # Main Body
 #
+if [ ! -d ${BASEDIR}/../data ]; then
+  echo "Error: ${BASEDIR} does not exist"
+  exit 1
+fi
+
 cd ${BASEDIR}
 
 checkIfRunning
