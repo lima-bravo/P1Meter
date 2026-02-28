@@ -6,7 +6,7 @@
 
 RSYNC=/usr/bin/rsync
 LOCAL=/home/pi/Programming/SmartMeter/data/
-REMOTE=lodewijk@imac.lan:/zfs/lodewijk/Archive/Programming/HomeAutomation/SmartMeter/data/
+REMOTE=lodewijk@imac.lan:/Volumes/apfs-user/lodewijk/Archive/Programming/HomeAutomation/SmartMeter/data/
 FLAGS="--stats --progress"
 
 # check if rsync exists
@@ -20,6 +20,9 @@ if [ ! -d ${LOCAL} ]; then
 	echo "local directory not found"
 	exit 1
 fi  
+
+deleted=$(($(find "${LOCAL}" -type f -size 0 -delete -print | wc -l)))
+echo "Deleted ${deleted} zero-size file(s)."
 
 # now execute the rsync command
 
