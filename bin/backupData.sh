@@ -9,6 +9,11 @@ LOCAL=/home/pi/Programming/SmartMeter/data/
 REMOTE=lodewijk@imac.lan:/Volumes/apfs-user/lodewijk/Archive/Programming/HomeAutomation/SmartMeter/data/
 FLAGS="--stats --progress"
 
+# check if we are on host p1pi
+if [ "$(hostname -s)" != "p1pi" ]; then
+	echo "Error: This script must run on p1pi (current host: $(hostname -s))." >&2
+	exit 1
+fi
 # check if rsync exists
 if [ ! -x ${RSYNC} ]; then
 	echo "rsync not found"
@@ -35,13 +40,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # now find and delete all files in the local directory that are older than 30 days
-find ${LOCAL} -type f -mtime +30 -print # -delete
-
-# check the exit status
-if [ $? -ne 0 ]; then
-	echo "deletion failed"
-	exit 1
-fi
+deleted=$(($(find ${LOCAL} -type f -mtime +30 -print -delete | wc -l)))
+echo "Deleted ${deleted} files older than 30 days."
 
 # now exit with success
 exit 0
