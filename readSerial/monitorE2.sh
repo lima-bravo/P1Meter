@@ -12,7 +12,7 @@ fi
 # write a note to stdout that the E2 monitor is starting
 echo "Starting E2 monitor"
 # Suppress tail's stderr (e.g. "file has been replaced" after log rotation)
-tail -f "$LOGFILE" 2>/dev/null | while read -r line; do
+tail -F "$LOGFILE" 2>/dev/null | while read -r line; do
 	if [[ $line =~ .*E2.* ]]; then
 		timestamp=$(date "+%y%m%d@%H%M%S")
 		echo "[$timestamp] $line"
