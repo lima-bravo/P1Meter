@@ -30,4 +30,4 @@ echo "Deleted ${deleted} zero-size file(s)."
 
 
 # now exit with success
-exit 0
+echo "done"
